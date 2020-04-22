@@ -76,13 +76,11 @@ if args.data == 'cifar100':
     train_loader, val_loader, test_loader = utils_data.get_cifar100_loaders(batch_size=args.train_bs,
                                                                            test_batch_size=args.test_bs,
                                                                            val_size=args.val_size,
-                                                                           limit=args.limit_dataset,
                                                                            augmentation=args.augmentation)
 if args.data == 'cifar10':
     train_loader, val_loader, test_loader = utils_data.get_cifar10_loaders(batch_size=args.train_bs,
                                                                            test_batch_size=args.test_bs,
                                                                            val_size=args.val_size,
-                                                                           limit=args.limit_dataset,
                                                                            augmentation=args.augmentation)
 
 # Seed for training process
@@ -172,8 +170,6 @@ for epoch in range(1, args.epochs + 1):
     train_loss = 0.
     train_acc = 0.
     if args.odenet:
-        if epoch>=args.warm_stoch:
-            model.set_stoch_type(args.stoch_type)
         train_forward_nfe = AverageMeter()
         train_backward_nfe = AverageMeter()
     for x, y in train_loader:

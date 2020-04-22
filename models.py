@@ -198,9 +198,6 @@ class ODENet_cifar100(nn.Module):
         for time_interval in range(n_blocks):
             blocks.append(ODEBlock(
                 ODEfunc(planes=planes, args=args), [time_interval, time_interval+1], args))
-            if args.dpnorm:
-                if time_interval<n_blocks-1:
-                    blocks.append(norm(planes))
         return nn.Sequential(*blocks)
 
     def get_nfe(self):
@@ -309,9 +306,6 @@ class ODENet_cifar10(nn.Module):
         for time_interval in range(n_blocks):
             blocks.append(ODEBlock(
                 ODEfunc(planes=planes, args=args), [time_interval, time_interval+1], args))
-            if args.dpnorm:
-                if time_interval<n_blocks-1:
-                    blocks.append(norm(planes))
         return nn.Sequential(*blocks)
 
     def get_nfe(self):

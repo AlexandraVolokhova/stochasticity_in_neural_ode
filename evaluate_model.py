@@ -10,8 +10,10 @@ import utils_data
 from logger import Logger
 from models import ResNet_cifar100
 from models import ResNet_cifar10
+from models import ResNet_tinyimagenet
 from models import ODENet_cifar100
 from models import ODENet_cifar10
+from models import ODENet_tinyimagenet
 
 parser = myexman.ExParser(file=os.path.basename(__file__))
 parser.add_argument('--name', default='')
@@ -64,6 +66,11 @@ if args.data == 'cifar10':
                                                                            test_batch_size=args.test_bs,
                                                                            val_size=0.,
                                                                            augmentation=args.augmentation)
+if args.data == 'tinyimagenet':
+    train_loader, _, test_loader = utils_data.get_tiny_imagenet_loaders(train_batch_size=args.train_bs,
+                                                   test_batch_size=args.test_bs,
+                                                   augmentation=args.augmentation,
+                                                   val_size=0)
 # Seed for training process
 np.random.seed(args.seed)
 torch.manual_seed(args.seed)
@@ -74,11 +81,15 @@ if args.odenet:
         model = ODENet_cifar100(args).to(device)
     if args.data == 'cifar10':
         model = ODENet_cifar10(args).to(device)
+    if args.data == 'tinyimagenet':
+        model = ODENet_tinyimagenet(args).to(device)
 else:
     if args.data == 'cifar100':
         model = ResNet_cifar100(args).to(device)
     if args.data == 'cifar10':
         model = ResNet_cifar10(args).to(device)
+    if args.data == 'tinyimagenet':
+        model = ResNet_tinyimagenet(args).to(device)
 
 total_params = sum(p.numel() for p in model.parameters())
 print("total_params: {}".format(total_params))

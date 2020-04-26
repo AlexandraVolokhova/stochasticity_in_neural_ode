@@ -324,3 +324,91 @@ class ODENet_cifar10(nn.Module):
         for seq in [self.ode1, self.ode2, self.ode3]:
             for block in seq:
                 block.stoch_type = stoch_type
+
+class ResNet_tinyimagenet(nn.Module):
+    def __init__(self, args):
+        super(ResNet_tinyimagenet, self).__init__()
+        self.pre = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=5, padding=2, stride=2),
+            nn.MaxPool2d(kernel_size=3, stride=2, padding=1),
+            nn.BatchNorm2d(64),
+            nn.ReLU(inplace=True)
+        )
+        self.res1 = self._make_res_blocks(args, 64, n_blocks=3)
+        self.down1 = DownSamplingBlock(64, 128)
+        self.res2 = self._make_res_blocks(args, 128, n_blocks=3)
+        self.down2 = DownSamplingBlock(128, 256)
+        self.res3 = self._make_res_blocks(args, 256, n_blocks=5)
+        self.down3 = DownSamplingBlock(256, 512)
+        self.res4 = self._make_res_blocks(args, 512, n_blocks=2)
+        self.avg = nn.AvgPool2d(2)
+        self.flatten = Flatten()
+        self.fc = nn.Linear(512, 200)
+
+    def forward(self, x):
+        out = self.pre(x)
+        out = self.down1(self.res1(out))
+        out = self.down2(self.res2(out))
+        out = self.down3(self.res3(out))
+        out = self.avg(self.res4(out))
+        out = self.fc(self.flatten(out))
+        return out
+
+    def _make_res_blocks(self, args, planes, n_blocks=2):
+        blocks = []
+        for _ in range(n_blocks):
+            blocks.append(ResBlock(planes=planes, args=args))
+        return nn.Sequential(*blocks)
+
+class ODENet_tinyimagenet(nn.Module):
+    def __init__(self, args):
+        super(ODENet_tinyimagenet, self).__init__()
+        self.pre = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=5, padding=2, stride=2),
+            nn.BatchNorm2d(64),
+            nn.MaxPool2d(kernel_size=3, stride=2, padding=1),
+            nn.ReLU(inplace=True)
+        )
+        self.ode1 = self._make_ode_blocks(args, 64, n_blocks=3)
+        self.down1 = DownSamplingBlock(64, 128)
+        self.ode2 = self._make_ode_blocks(args, 128, n_blocks=3)
+        self.down2 = DownSamplingBlock(128, 256)
+        self.ode3 = self._make_ode_blocks(args, 256, n_blocks=5)
+        self.down3 = DownSamplingBlock(256, 512)
+        self.ode4 = self._make_ode_blocks(args, 512, n_blocks=2)
+        self.avg = nn.AvgPool2d(2)
+        self.flatten = Flatten()
+        self.fc = nn.Linear(512, 200)
+
+    def forward(self, x):
+        out = self.pre(x)
+        out = self.down1(self.ode1(out))
+        out = self.down2(self.ode2(out))
+        out = self.down3(self.ode3(out))
+        out = self.avg(self.ode4(out))
+        out = self.fc(self.flatten(out))
+        return out
+
+    def _make_ode_blocks(self, args, planes, n_blocks=2):
+        blocks = []
+        for time_interval in range(n_blocks):
+            blocks.append(ODEBlock(
+                ODEfunc(planes=planes, args=args), [time_interval, time_interval+1], args))
+        return nn.Sequential(*blocks)
+
+    def get_nfe(self):
+        nfe = []
+        for seq in [self.ode1, self.ode2, self.ode3, self.ode4]:
+            for block in seq:
+                nfe.append(block.nfe)
+        return np.mean(nfe)
+
+    def set_nfe(self, value):
+        for seq in [self.ode1, self.ode2, self.ode3, self.ode4]:
+            for block in seq:
+                block.nfe = value
+
+    def set_stoch_type(self, stoch_type):
+        for seq in [self.ode1, self.ode2, self.ode3, self.ode4]:
+            for block in seq:
+                block.stoch_type = stoch_type

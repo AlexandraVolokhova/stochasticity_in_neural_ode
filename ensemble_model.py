@@ -10,6 +10,7 @@ import utils_data
 from logger import Logger
 from models import ODENet_cifar100
 from models import ODENet_cifar10
+from models import ODENet_tinyimagenet
 
 parser = myexman.ExParser(file=os.path.basename(__file__))
 parser.add_argument('--name', default='')
@@ -54,10 +55,22 @@ np.random.seed(args.data_seed)
 torch.manual_seed(args.data_seed)
 torch.cuda.manual_seed_all(args.data_seed)
 
-train_loader, val_loader, test_loader = utils_data.get_cifar100_loaders(batch_size=args.train_bs,
-                                                                       test_batch_size=args.test_bs,
-                                                                       val_size=args.val_size,
-                                                                       augmentation=args.augmentation)
+if args.data == 'cifar100':
+    train_loader, val_loader, test_loader = utils_data.get_cifar100_loaders(batch_size=args.train_bs,
+                                                                           test_batch_size=args.test_bs,
+                                                                           val_size=args.val_size,
+                                                                           augmentation=args.augmentation)
+if args.data == 'cifar10':
+    train_loader, val_loader, test_loader = utils_data.get_cifar10_loaders(batch_size=args.train_bs,
+                                                                           test_batch_size=args.test_bs,
+                                                                           val_size=args.val_size,
+                                                                           augmentation=args.augmentation)
+if args.data == 'tinyimagenet':
+    train_loader, val_loader, test_loader = utils_data.get_tiny_imagenet_loaders(train_batch_size=args.train_bs,
+                                                   test_batch_size=args.test_bs,
+                                                   augmentation=args.augmentation,
+                                                   val_size=args.val_size)
+
 # Seed for training process
 np.random.seed(args.seed)
 torch.manual_seed(args.seed)
@@ -67,6 +80,8 @@ if args.data == 'cifar100':
     model = ODENet_cifar100(args).to(device)
 if args.data == 'cifar10':
     model = ODENet_cifar10(args).to(device)
+if args.data == 'tinyimagenet':
+    model = ODENet_tinyimagenet(args).to(device)
 
 total_params = sum(p.numel() for p in model.parameters())
 print("total_params: {}".format(total_params))

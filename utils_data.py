@@ -155,3 +155,55 @@ def get_cifar10_loaders(batch_size=128, test_batch_size=1000, val_size=0.2, data
     )
 
     return train_loader, valid_loader, test_loader
+
+def get_tiny_imagenet_loaders(train_batch_size=128, test_batch_size=128, data_root=DATA_ROOT,
+                              augmentation=True, num_workers=0, val_size=0.2, verbose=False):
+    if augmentation:
+        train_transform = transforms.Compose([
+            transforms.RandomCrop(64, padding=8),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+        ])
+    else:
+        train_transform = transforms.Compose([
+            transforms.ToTensor(),
+        ])
+    test_transform = transforms.Compose([
+        transforms.ToTensor(),
+    ])
+
+    data_transforms = {
+        'train': train_transform,
+        'val': test_transform,
+        'test': test_transform
+    }
+    data_dir = os.path.join(data_root, 'tiny-imagenet-200')
+    paths = {
+        'train': os.path.join(data_dir, 'train'),
+        'val': os.path.join(data_dir, 'val'),
+        'test': os.path.join(data_dir, 'test')
+    }
+    train_dataset = datasets.ImageFolder(paths['train'], data_transforms['train'])
+    val_dataset = datasets.ImageFolder(paths['train'], data_transforms['val'])
+    test_dataset = datasets.ImageFolder(paths['val'], data_transforms['test'])
+
+    num_train = len(train_dataset)
+    indices = list(range(num_train))
+    split = int(np.floor(val_size * num_train))
+
+    if verbose:
+        print("train size: {}\nsplit: {}\n".format(num_train, split))
+    np.random.shuffle(indices)
+
+    train_idx, val_idx = indices[split:], indices[:split]
+    train_sampler = torch.utils.data.SubsetRandomSampler(train_idx)
+    val_sampler = torch.utils.data.SubsetRandomSampler(val_idx)
+
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=train_batch_size, sampler=train_sampler,
+                                   num_workers=num_workers)
+    val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=test_batch_size, sampler=val_sampler,
+                                 num_workers=num_workers)
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=test_batch_size,
+                                  shuffle=False, num_workers=num_workers)
+
+    return train_loader, val_loader, test_loader

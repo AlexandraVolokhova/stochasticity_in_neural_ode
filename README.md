@@ -1,6 +1,6 @@
 # Stochasticity in neural ODEs
 ![img](https://github.com/AlexandraVolokhova/stochasticity_in_neural_ode/raw/master/pictures/stoch_trajectories.png)
-This repo contains the code for experiments from the paper ["Stochasticity in Neural ODEs: An Empirical Study"](https://openreview.net/forum?id=Skx2iCNFwB), where we experimentally explore regularization properties of stochasticity in the neural ODE
+This repo contains the code for experiments from the paper ["Stochasticity in Neural ODEs: An Empirical Study"](https://openreview.net/forum?id=C4ydiXrYw), where we experimentally explore regularization properties of stochasticity in the neural ODE
 
 ## Run experiments
 First of all you should define two enviromental virables ```DATA_ROOT``` as the full path to the directory with datasets and ```EXMAN_PATH``` as the path for saving logs. After that, I can train models running the following scripts.

@@ -108,6 +108,6 @@ tiny imagenet ResNet with augmentation:
 ```python train_model.py --data tinyimagenet --train_bs 256 --test_bs 256 --augmentation True --norm True  --odenet False --lr 0.1--warm 3 --wd 1e-4 --val_size 0.0```
 
 ## External libraries:
-We adopted code from the following repositories:
+We adapted code from the following repositories:
 * [torchdiffeq](https://github.com/rtqichen/torchdiffeq) is a library for solving differential equations numerically using PyTorch. We added a numerical solver for stochastic equations there.
 * [exman](https://github.com/ferrine/exman) is an experiment manager (a logger and an argument parser), our adopted version is in the ```myexman``` directory

@@ -109,5 +109,5 @@ tiny imagenet ResNet with augmentation:
 
 ## External libraries:
 We adapted code from the following repositories:
-* [torchdiffeq](https://github.com/rtqichen/torchdiffeq) is a library for solving differential equations numerically using PyTorch. We added a numerical solver for stochastic equations there.
-* [exman](https://github.com/ferrine/exman) is an experiment manager (a logger and an argument parser), our adopted version is in the ```myexman``` directory
+* [torchdiffeq](https://github.com/rtqichen/torchdiffeq) is a library for solving differential equations numerically using PyTorch. We added a numerical solver for stochastic equations in this lib.
+* [exman](https://github.com/ferrine/exman) is an experiment manager (a logger and an argument parser), our adapted version is in the ```myexman``` directory
